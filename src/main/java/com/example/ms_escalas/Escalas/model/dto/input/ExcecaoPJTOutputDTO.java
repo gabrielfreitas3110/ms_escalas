@@ -1,6 +1,8 @@
-package com.example.ms_escalas.Escalas.model;
+package com.example.ms_escalas.Escalas.model.dto.input;
 
-import jakarta.persistence.*;
+import com.example.ms_escalas.Escalas.model.Documento;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,16 +11,13 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Getter
 @Setter
-public class ExcecaoParametroJornadaTrabalho {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExcecaoPJTOutputDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long unidade;
     private Long setor;
@@ -30,9 +29,5 @@ public class ExcecaoParametroJornadaTrabalho {
     private LocalTime horarioFimExecucao;
     private String numeroSEI;
     private String justificativa;
-
-    @OneToOne
-    @JoinColumn(name = "documento_id", nullable = false)
     private Documento documento;
-
 }

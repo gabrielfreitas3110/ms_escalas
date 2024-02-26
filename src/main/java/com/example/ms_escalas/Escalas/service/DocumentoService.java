@@ -72,4 +72,9 @@ public class DocumentoService {
         }
         return  resource;
     }
+
+    public Documento getById(Long id) {
+        //TODO: Criar lançamento de exceção quando o objeto não é encontrado.
+        return documentoRepository.findById(id).orElseThrow(null);
+    }
 }
