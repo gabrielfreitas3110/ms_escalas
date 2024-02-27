@@ -18,4 +18,7 @@ public class Documento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String path;
+
+    @OneToOne(mappedBy = "documento")
+    private ExcecaoParametroJornadaTrabalho excecaoPJT;
 }

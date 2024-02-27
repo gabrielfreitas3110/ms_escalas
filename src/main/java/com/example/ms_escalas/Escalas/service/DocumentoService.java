@@ -3,6 +3,8 @@ package com.example.ms_escalas.Escalas.service;
 import com.example.ms_escalas.Escalas.model.Documento;
 import com.example.ms_escalas.Escalas.model.enums.ExtensoesEnum;
 import com.example.ms_escalas.Escalas.repository.DocumentoRepository;
+import com.example.ms_escalas.Escalas.service.exception.BadRequestException;
+import com.example.ms_escalas.Escalas.service.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -30,7 +32,7 @@ public class DocumentoService {
     @Value("${directory}")
     private String directory;
 
-    public String uploadFile(MultipartFile file) {
+    public Documento uploadFile(MultipartFile file) {
         String filename = file.getOriginalFilename();
 
         String extensao = filename.substring(filename.lastIndexOf(".") + 1);
@@ -38,7 +40,7 @@ public class DocumentoService {
         List<String> extensoesPermitidas = ExtensoesEnum.getDescricoes();
 
         if(!extensoesPermitidas.contains(extensao)) {
-            return "Extensão não permitida.";
+            throw new BadRequestException("Extensão não permitida.");
         }
 
         Path filePath = Paths.get(directory, filename);
@@ -54,13 +56,13 @@ public class DocumentoService {
 
         Documento documento = new Documento();
         documento.setPath(absolutPath);
-        documentoRepository.save(documento);
+        documento = documentoRepository.save(documento);
 
-        return absolutPath;
+        return documento;
   }
 
     public Resource getFile(Long id) {
-        Documento documento = documentoRepository.findById(id).get();
+        Documento documento = getById(id);
 
         Path filePath = Paths.get(documento.getPath());
         Resource resource;
@@ -74,7 +76,7 @@ public class DocumentoService {
     }
 
     public Documento getById(Long id) {
-        //TODO: Criar lançamento de exceção quando o objeto não é encontrado.
-        return documentoRepository.findById(id).orElseThrow(null);
+        return documentoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Documento não encontrado. Id: " + id));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.ms_escalas.Escalas.controller;
 
+import com.example.ms_escalas.Escalas.model.Documento;
 import com.example.ms_escalas.Escalas.service.DocumentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -8,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("documento")
@@ -17,10 +21,12 @@ public class DocumentoController {
     private DocumentoService documentoService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
 
-        String path = documentoService.uploadFile(file);
-        return ResponseEntity.ok().body(path);
+        Documento documento = documentoService.uploadFile(file);
+        URI location = UriComponentsBuilder.fromUriString("http://localhost:8080/documento/download/{id}")
+                .buildAndExpand(documento.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/download/{id}")

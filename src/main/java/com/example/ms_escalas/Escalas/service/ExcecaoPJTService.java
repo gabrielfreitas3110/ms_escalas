@@ -2,26 +2,15 @@ package com.example.ms_escalas.Escalas.service;
 
 import com.example.ms_escalas.Escalas.model.Documento;
 import com.example.ms_escalas.Escalas.model.ExcecaoParametroJornadaTrabalho;
-import com.example.ms_escalas.Escalas.model.dto.input.ExcecaoPJTInputDTO;
-import com.example.ms_escalas.Escalas.model.dto.input.ExcecaoPJTOutputDTO;
-import com.example.ms_escalas.Escalas.model.enums.ExtensoesEnum;
-import com.example.ms_escalas.Escalas.repository.DocumentoRepository;
+import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTInputDTO;
+import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTOutputDTO;
 import com.example.ms_escalas.Escalas.repository.ExcecaoPJTRepository;
+import com.example.ms_escalas.Escalas.service.exception.BadRequestException;
+import com.example.ms_escalas.Escalas.service.exception.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.Doc;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -41,14 +30,16 @@ public class ExcecaoPJTService {
         if(excecaoPJTInputDTO.getIsTempoDeterminado()) {
             if(Objects.isNull(excecaoPJTInputDTO.getDataInicio())  || Objects.isNull(excecaoPJTInputDTO.getDataFim()) ||
             Objects.isNull(excecaoPJTInputDTO.getHorarioFimExecucao())) {
-                //TODO: Lançar exceção personalizada
-                return null;
+                throw new BadRequestException("Os campos Data início, Data Fim e Horário Fim Execução são obrigatórios.");
             }
         }
 
         ExcecaoParametroJornadaTrabalho excecao = modelMapper.map(excecaoPJTInputDTO, ExcecaoParametroJornadaTrabalho.class);
 
         Documento documento = documentoService.getById(excecaoPJTInputDTO.getDocumento());
+        if(Objects.nonNull(documento.getExcecaoPJT())) {
+            throw new BadRequestException("O documento já está vinculado a  uma Exceção.");
+        }
         excecao.setDocumento(documento);
 
         excecao = excecaoPJTRepository.save(excecao);
@@ -56,8 +47,8 @@ public class ExcecaoPJTService {
     }
 
     public ExcecaoPJTOutputDTO getExcecaoById(Long id) {
-        //TODO: criar exceção personalizada quando o objeto não for encontrado.
-        ExcecaoParametroJornadaTrabalho excecao = excecaoPJTRepository.findById(id).orElseThrow(null);
+        ExcecaoParametroJornadaTrabalho excecao = excecaoPJTRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Exceção não encontrada. Id: " + id));
         ExcecaoPJTOutputDTO excecaoOutput = modelMapper.map(excecao, ExcecaoPJTOutputDTO.class);
         return excecaoOutput;
     }

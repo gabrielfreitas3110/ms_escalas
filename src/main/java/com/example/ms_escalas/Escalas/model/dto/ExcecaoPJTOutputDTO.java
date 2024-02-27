@@ -1,9 +1,8 @@
-package com.example.ms_escalas.Escalas.model.dto.input;
+package com.example.ms_escalas.Escalas.model.dto;
 
 import com.example.ms_escalas.Escalas.model.Documento;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,29 +16,18 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExcecaoPJTInputDTO {
+public class ExcecaoPJTOutputDTO {
 
-    @NotNull(message = "Id da Unidade é obrigatório.")
+    private Long id;
     private Long unidade;
-
-    @NotNull(message = "Id da Setor é obrigatório.")
     private Long setor;
-
-    @NotNull(message = "Servidor Masp é obrigatório.")
     private String servidorMasp;
     private String categoriaProfissional;
-
-    @NotNull(message = "Tempo Determinado é obrigatório.")
     private Boolean isTempoDeterminado;
-
     private LocalDate dataInicio;
     private LocalDate dataFim;
     private LocalTime horarioFimExecucao;
     private String numeroSEI;
-
-    @NotNull(message = "Justificativa é obrigatório.")
     private String justificativa;
-
-    @NotNull(message = "Documento é obrigatório.")
-    private Long documento;
+    private DocumentoOutputDTO documento;
 }
