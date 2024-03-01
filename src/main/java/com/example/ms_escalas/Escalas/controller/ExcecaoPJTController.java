@@ -2,6 +2,7 @@ package com.example.ms_escalas.Escalas.controller;
 
 import com.example.ms_escalas.Escalas.model.ExcecaoParametroJornadaTrabalho;
 import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTInputDTO;
+import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTInputUpdateDTO;
 import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTOutputDTO;
 import com.example.ms_escalas.Escalas.service.ExcecaoPJTService;
 import jakarta.validation.Valid;
@@ -31,6 +32,20 @@ public class ExcecaoPJTController {
     public ResponseEntity<ExcecaoPJTOutputDTO> buscarPorId(@PathVariable("id") Long id) {
         ExcecaoPJTOutputDTO excecao = excecaoPJTService.getExcecaoById(id);
         return ResponseEntity.ok().body(excecao);
+
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ExcecaoPJTOutputDTO> atualizarExcecao(@RequestBody ExcecaoPJTInputUpdateDTO excecaoUpdate, @PathVariable("id") Long id) {
+        ExcecaoPJTOutputDTO excecao = excecaoPJTService.updateExcecao(id, excecaoUpdate);
+        return ResponseEntity.ok().body(excecao);
+
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> apagarExcecao(@PathVariable("id") Long id) {
+       excecaoPJTService.deleteExcecao(id);
+        return ResponseEntity.ok().build();
 
     }
 

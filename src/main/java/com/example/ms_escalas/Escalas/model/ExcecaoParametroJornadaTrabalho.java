@@ -31,8 +31,12 @@ public class ExcecaoParametroJornadaTrabalho {
     private String numeroSEI;
     private String justificativa;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "documento_id", nullable = false)
     private Documento documento;
+
+    @ManyToOne
+    @JoinColumn(name = "parametro_jornada_trabalho_id")
+    private ParametroJornadaTrabalho parametroJornadaTrabalho;
 
 }

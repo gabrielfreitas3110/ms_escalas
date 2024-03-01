@@ -12,10 +12,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.Doc;
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -42,7 +39,11 @@ public class DocumentoService {
         if(!extensoesPermitidas.contains(extensao)) {
             throw new BadRequestException("Extensão não permitida.");
         }
-
+        Path directoryPath = Paths.get(directory);
+        if(!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
+            File direcotryFile = new File(directory);
+            direcotryFile.mkdirs();
+        }
         Path filePath = Paths.get(directory, filename);
 
         try {

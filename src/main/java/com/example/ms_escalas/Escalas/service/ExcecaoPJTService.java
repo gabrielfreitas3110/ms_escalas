@@ -3,14 +3,18 @@ package com.example.ms_escalas.Escalas.service;
 import com.example.ms_escalas.Escalas.model.Documento;
 import com.example.ms_escalas.Escalas.model.ExcecaoParametroJornadaTrabalho;
 import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTInputDTO;
+import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTInputUpdateDTO;
 import com.example.ms_escalas.Escalas.model.dto.ExcecaoPJTOutputDTO;
 import com.example.ms_escalas.Escalas.repository.ExcecaoPJTRepository;
 import com.example.ms_escalas.Escalas.service.exception.BadRequestException;
 import com.example.ms_escalas.Escalas.service.exception.ObjectNotFoundException;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.Objects;
 
 @Service
@@ -47,9 +51,33 @@ public class ExcecaoPJTService {
     }
 
     public ExcecaoPJTOutputDTO getExcecaoById(Long id) {
-        ExcecaoParametroJornadaTrabalho excecao = excecaoPJTRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Exceção não encontrada. Id: " + id));
+        ExcecaoParametroJornadaTrabalho excecao = findById(id);
         ExcecaoPJTOutputDTO excecaoOutput = modelMapper.map(excecao, ExcecaoPJTOutputDTO.class);
         return excecaoOutput;
+    }
+
+    private ExcecaoParametroJornadaTrabalho findById(Long id) {
+        ExcecaoParametroJornadaTrabalho excecao = excecaoPJTRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Exceção não encontrada. Id: " + id));
+        return excecao;
+    }
+
+    public ExcecaoPJTOutputDTO updateExcecao(Long id, ExcecaoPJTInputUpdateDTO excecaoUpdate) {
+        ExcecaoParametroJornadaTrabalho excecao = findById(id);
+        modelMapper.map(excecaoUpdate, excecao);
+        excecao = excecaoPJTRepository.save(excecao);
+        ExcecaoPJTOutputDTO excecaoOutput = modelMapper.map(excecao, ExcecaoPJTOutputDTO.class);
+        return excecaoOutput;
+    }
+
+    @Transactional
+    public void deleteExcecao(Long id) {
+        ExcecaoParametroJornadaTrabalho excecao = findById(id);
+        if(Objects.nonNull(excecao.getParametroJornadaTrabalho())) {
+            throw new BadRequestException("Não é possivel apagar uma exceção vinculada a um Parâmetro.");
+        }
+        File direcotryFile = new File(excecao.getDocumento().getPath());
+        direcotryFile.delete();
+        excecaoPJTRepository.delete(excecao);
     }
 }

@@ -34,8 +34,7 @@ public class ParametroJornadaTrabalho {
     private StatusEnum statusEnum;
     private HabilitadoEnum habilitadoEnum;
 
-    @OneToMany
-    @JoinColumn(name = "parametro_jornada_trabalho_id")
+    @OneToMany(mappedBy = "parametroJornadaTrabalho")
     private List<ExcecaoParametroJornadaTrabalho> excecoesParametroJornadaTrabalho;
 
     @OneToOne
